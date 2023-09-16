@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+/* 모든 글꼴을 바꿈 */
+* {
+  font-family: 'Nanum Pen Script', cursive;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  /* 몇줄까지 표현 허용할기 결정하는 변수 값 */
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}

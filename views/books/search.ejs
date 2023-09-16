@@ -1,0 +1,123 @@
+<div class="row my-5">
+    <div class="col">
+        <h1 class="text-center mb-5">도서검색</h1>
+        <!-- 도서명 검색창 -->
+        <div class="row justify-content-end my-2">
+            <!-- 고해상도 6칸 중해상도 4칸  저해상도 3칸 차지-->
+            <form class="col-6 col-md-4 col-lg-3" name="frm">
+                <div class="input-group">
+                    <input class="form-control" name="query" value="자바">
+                    <button class="btn btn-primary">검색</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 도서 검색 목록 -->
+        <div id="div_books"></div>
+
+        <!-- 페이지 이동 -->
+        <div class="text-center">
+            <button id = "prev"class="btn btn-primary">이전</button>
+            <!-- 좌우 마진 3 :  mx-3 -->
+            <span id="span_page" class="mx-3">1/10</span>
+            <button id = "next" class="btn btn-primary">다음</button>
+        </div>
+
+    </div>
+</div>
+<!-- 도서목록 템플릿 -->
+<script type="x-handlebars-template" id="temp_books">
+    <table class="table table-striped">
+        {{#each documents}}
+            <tr>
+                <td><img src="{{check thumbnail}}" width="50"></td>
+                <td>{{title}}</td>
+                <td>{{format price}}</td>
+                <td>{{authors}}</td>
+            </tr>
+        {{/each}}
+    </table>
+</script>
+<script>
+    // 도서의 사진이 없을 경우 더미사진을 대체하기 위한 스크립트
+    // 함수명 : check / 매개변수로의 함수 : function(thumnail)
+    Handlebars.registerHelper("check",function(thumbnail){
+        if(thumbnail){
+            return thumbnail;
+        }else{
+            return "http://via.placeholder.com/120x170";
+        }
+    });
+    Handlebars.registerHelper("format",function(price){
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원';
+    });
+</script>
+<script>
+    // frm의 query 의 값을 전역변수 query에 담는다.
+    let query=$(frm.query).val();
+    let page=1;
+
+    // 만든 사용자함수 호출
+    getBooks();
+
+    // name 을 가진 객체를 선택할때는 따로 붙는 기호가 없다. id=#
+    $(frm).on("submit", function(e){
+        // 새로운 키워드로 검색할때마다 페이지 수를 초기화한다.
+        page = 1;
+        // submit 이벤트를 막음으로써 화면 깜박임을 없앤다.
+        e.preventDefault();
+        // 전역변수 query로부터 값을 받아와 getBooks 함수를 다시 호출하여 검색한다.
+        query=$(frm.query).val();
+        getBooks();
+    });
+
+    // 다음 버튼을 클릭한 경우
+    $("#next").on("click",function(){
+        page++;
+        getBooks();
+    });
+
+    // 이전 버튼을 클릭한 경우
+        $("#prev").on("click",function(){
+        page--;
+        getBooks();
+    });
+
+    function getBooks(){
+        // ajax 를 호출하는 문법 $.ajax({}) 외우기
+        $.ajax({
+            type:"get",
+            url:"https://dapi.kakao.com/v3/search/book?target=title",
+            headers:{"Authorization":"KakaoAK f96f320449f661314fb1500648392a8f"},
+            // query 검색어 변수에 검색어를 가져와야하기 때문에 변수명을 입력한다. 표시할 페이지수 , 1페이지당 표현할 책의 수
+            data:{query:query,page:page, size:6},
+            success:function(result){
+                // 콘솔을 통해 출력결과를 미리 확인할 수 있음
+                console.log(result);
+                // html 파일로 변환하기 위해 컴파일 작업을 거친다.
+                // html 파일에서 id로 객체를 선책하기 때문에 #으로 개체의 id를 선택한다. ( 32_line : #temp_books 중간고사 빈칸 예시 언급 )
+                let temp = Handlebars.compile($("#temp_books").html())
+                // div_Books: 템플릿 결과를 출력할 위치
+                $("#div_books").html(temp(result));
+                // 마지막 페이지 값을 계산한다.
+                // math.ceil 함수 사용 & 검색결과.meta.pageable_count / 6 
+                let last = Math.ceil(result.meta.pageable_count/6);
+                $("#span_page").html(page + "/" + last);
+
+                // 데이터 갖고 오기 - result 에 담기 - 컴파일 - 템플릿에 result를 담는다.
+                // 33_line : result 중간고사 빈칸 예시 언급
+                // 문제의 코드 안에 정답이 있도록 문제 출제 
+                // - 변수를 중점으로.. 사용자 정의함수 내의  프로그램의 전체적인 흐름 이해 필요
+
+                // 1페이지에서 이전 버튼 비활성화
+                if(page==1) $("#prev").attr("disabled", true);
+                else $("#prev").attr("disabled",false);
+
+                // 마지막 페이지에서 다음 버튼 비활성화
+                if(result.meta.is_end) $("#next").attr("disabled", true);
+                else $("#next").attr("disabled",false);
+
+            }
+        });
+    }
+</script>
