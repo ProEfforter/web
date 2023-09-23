@@ -1,3 +1,9 @@
+<style>
+    /* 이미지에 커서가 올라가면 포인터로 마우스의 모양이 변한다. */
+    #div_books img {
+        cursor: pointer;
+    }
+</style>
 <div class="row my-5">
     <div class="col">
         <!-- 검색폼 -->
@@ -35,7 +41,7 @@
         <div class="col-6 col-md-4 col-lg-2 mb-3">
             <div class="card">
                 <div class="card-body">
-                <img src="{{check thumbnail}}" width="90%">
+                <img src="{{check thumbnail}}" width="90%" index="{{@index}}">
                 <div class="ellipsis pt-3" style="font-size:1.1rem;">{{title}}</div>
                 </div>
                 <div class="card-footer style="font_size:1.1rem;">
@@ -43,6 +49,7 @@
                 </div>
             </div>
         </div>
+        <%-include('books/modal.ejs')%>
     {{/each}}
 </script>
 <script>
@@ -66,6 +73,14 @@
 
     // 만든 사용자함수 호출
     getBooks();
+
+    // 이미지를 클릭한 경우
+    $("#div_books").on("click", "img", function(){
+        // 인덱스의 값을 가져온다.
+        let index= $(this).attr("index");
+        // modal.ejs의 아이디를 인덱스 변수의 값을 활용하여 각기 다른 modal을 호출한다.
+        $("#modal" + index).modal("show");
+    });
 
     // name 을 가진 객체를 선택할때는 따로 붙는 기호가 없다. id=#
     $(frm).on("submit", function(e){
