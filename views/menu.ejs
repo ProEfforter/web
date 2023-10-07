@@ -19,8 +19,14 @@
           </li>
         </ul>
         <ul class="navbar-nav d-flex">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/login">로그인</a>
+            <li class="nav-item" id="login">
+              <a class="nav-link active" aria-current="page" href="/users/login">로그인</a>
+            </li>
+            <li class="nav-item" id="email" style="display: none;">
+              <a class="nav-link active" aria-current="page" href="/users/login">email</a>
+            </li>
+            <li class="nav-item" id="logout" style="display: none;">
+              <a class="nav-link active" aria-current="page" href="/users/login">로그아웃</a>
             </li>
           </ul>
         <!-- <form class="d-flex" role="search">
@@ -30,3 +36,24 @@
       </div>
     </div>
   </nav>
+
+  <script>
+    if(sessionStorage.getItem("email")){
+      // 로그인, 이메일, 로그아웃의 객체 시각상태를 반전한다.
+      $("#login, #email, #logout").toggle();
+      $("#email a").html(sessionStorage.getItem("email"));
+    }
+
+    // 로그아웃 메뉴를 클릭한 경우
+    $("#logout").on("click", "a", function(e){
+      // a 태크의 이동 이벤트 삭제
+      e.preventDefault();
+      if(confirm("정말 로그아웃 하시겠습니까?")){
+        // 세션 저장소의 정보를 전부 삭제한다.
+        sessionStorage.clear();
+        location.href="/";
+      }else{
+        // 로그아웃 취소
+      }
+    });
+  </script>

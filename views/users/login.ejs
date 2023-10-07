@@ -1,0 +1,70 @@
+<!-- 패딩과 마진의 최대값은 5 -->
+<style>
+    form span{
+        width: 100px;
+    }
+</style>
+<div class="row my-5 justify-content-center">
+    <div class="col-md-6">
+        <h1 class="text-center">로그인</h1>
+        <form name="frm" class="card p-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text">이메일</span>
+                <input name="email" class="form-control" value="blue@test.com">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">비밀번호</span>
+                <input name="password" class="form-control" type="password" value="12341234">
+            </div>
+            <button class="btn btn-primary">로그인</button>
+        </form>
+        <div class="text-end pt-2">
+            <a href="/users/join">회원가입</a>
+        </div>
+    </div>
+</div>
+<script type="module">
+    // public 이 루트 폴더
+    import { app } from "/javascripts/firebase.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    const auth = getAuth(app);
+
+
+    // 객체 선택 시 
+    // id = # , class = . m name = 없음
+    $(frm).on("submit",function(e){
+        // submit 이벤트 삭제
+        e.preventDefault();
+
+        // 유효성 체크 (이메일 혹은 이벤트의 공백)
+        const email = $(frm.email).val();
+        const password = $(frm.password).val();
+
+        if(email == ""){
+            alert("이메일을 입력하세요");
+            // 이메일에 커서 두기
+            $(frm.email).focus();
+        }else if(password == ""){
+            alert("비밀번호를 입력하세요");
+            $(frm.password).focus();
+        }else{
+            // 로그인 체크
+            //alert(email + password);
+            signInWithEmailAndPassword(auth,email,password).then(success=>{
+                // 로그인 성공 시
+                console.log(success);
+                alert("로그인 성공");
+                // 브라우져 세선에 사용자의 이메일과 uid를 저장
+                // 개발자도구(F12) - Application - session storage 저장
+                sessionStorage.setItem("email",email);
+                sessionStorage.setItem("uid",success.user.uid);
+                // 홈화면으로 이동
+                location.href="/";
+            }).catch(error=>{
+                // 로그인 실패 시
+                console.log(error);
+                alert(error.message);
+            });
+        }
+    });
+</script>
