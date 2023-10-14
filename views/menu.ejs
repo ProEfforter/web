@@ -17,6 +17,9 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/locals">지역검색</a>
           </li>
+          <li class="nav-item" id="cart" style="display: none;">
+            <a class="nav-link active" aria-current="page" href="/books/cart">장바구니</a>
+          </li>
         </ul>
         <ul class="navbar-nav d-flex">
             <li class="nav-item" id="login">
@@ -40,7 +43,7 @@
   <script>
     if(sessionStorage.getItem("email")){
       // 로그인, 이메일, 로그아웃의 객체 시각상태를 반전한다.
-      $("#login, #email, #logout").toggle();
+      $("#login, #email, #logout, #cart").toggle();
       $("#email a").html(sessionStorage.getItem("email"));
     }
 

@@ -1,0 +1,90 @@
+<div class="my-5">
+    <h1 class="text-center mb-5">장바구니</h1>
+    <div id="div_cart"></div>
+</div>
+<!-- 핸들바의 #each . - /each 중간고사 언급 -->
+<script id="temp_cart" type="x-handlebars-template">
+    <table class="table">
+        <tr>
+            <td colspan="7">
+                <input type="checkbox" id="all">
+                <button class="btn btn-warning btn-sm ms-3">선택삭제</button>
+            </td>
+        </tr>
+        {{#each .}}
+            <tr>
+                <td><input type="checkbox" class="chk"></td>
+                <td><img src="{{thumbnail}}" width="30"></td>
+                <td>{{title}}</td>
+                <td>{{authors}}</td>
+                <td>{{price}}</td>
+                <td>{{publisher}}</td>
+                <td><button class ="btn btn-danger btn-sm" isbn="{{isbn}}">삭제</button></td>
+            </tr>
+        {{/each}}
+    </table>
+</script>
+<!-- type = module 중간고사 언급 -->
+<script type="module">
+    import { app } from "/javascripts/firebase.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    // app 중간고사 언급 ★
+    const db = getDatabase(app);
+
+    // 선택삭제 버튼을 클릭한 경우
+    $("#div_cart").on("click",".btn-warning",function(){
+        const chk = $("#div_cart .chk:checked").length;
+        if(chk==0){
+            alert("삭제할 도서를 선택하세요.");
+        }else{
+            if(!confirm("선택하신 도서 "+chk+ "개 를 삭제하시겠습니까?"))return;
+            //도서삭제
+            $("#div_cart .chk:checked").each(item=>{
+                alert("..");
+            });
+        }
+    });
+    // 전체 체크박스 클릭한 경우
+    $("#div_cart").on("click","#all",function(){
+        // 체크박스의 상태를 체크하는 경우, :을 사용하여 상태값을 확인 (체크박스는 중간고사 x)
+        if($(this).is(":checked")){
+            // all checkbox 가 체크되어 있는 경우
+            $("#div_cart .chk").prop("checked", true);
+        }else{
+            // all checkbox 가 체크되어 있지 않는 경우
+            $("#div_cart .chk").prop("checked", false);
+        }
+    });
+    // 각 행의 체크박스는 누른 경우
+    $("#div_cart").on("click",".chk", function(){
+        const all = $("#div_cart .chk").length;
+        const chk = $("#div_cart .chk:checked").length;
+        if(all==chk){
+            $("#div_cart #all").prop("checked",true);
+        }
+        else{
+            $("#div_cart #all").prop("checked",false);
+        }
+    });
+    // 장바구니 도서목록 가져오기
+    const ref_cart = ref(db,`cart/${sessionStorage.getItem("uid")}`);
+    onValue(ref_cart, result=>{
+        let items=[];
+        result.forEach(item=>{
+            //console.log(item.key, item.val());
+            items.push(item.val());
+        });
+        //console.log(items);
+        const temp = Handlebars.compile($("#temp_cart").html());
+        // 컴파일한 html 값을 div_cart에 넣는 과정 중간고사 언급★
+        $("#div_cart").html(temp(items))
+        // 삭제버튼을 클릭한 경우
+        $("#div_cart").on("click",".btn-danger", async function(){
+            const isbn = $(this).attr("isbn");
+            if(!confirm(`${isbn} 삭제하시겠습니까?`)) return;
+            const ref_cart = ref(db, `cart/${sessionStorage.getItem("uid")}/${isbn}`);
+            await remove(ref_cart);
+            alert("삭제되었습니다.");
+        });
+    });
+</script>
