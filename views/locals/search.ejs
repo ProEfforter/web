@@ -34,17 +34,49 @@
             <td>{{address_name}}</td>
             <td>{{phone}}</td>
             <td><button class="btn btn-primary" x="{{x}}" y="{{y}}">위치보기</button></td>
+            <td><button class="btn btn-primary btn-sm favorite" local="{{toString @this}}">즐겨찾기</button></td>
         </tr>
         {{/each}}
     </table>
 </script>
-
+<!-- 로컬객체를 문자열로 바꿔주는 핸들바 함수 -->
 <script>
+    Handlebars.registerHelper("toString", function(local){
+        return JSON.stringify(local);
+    });
+</script>
+<script type="module">
+    import { app } from "/javascripts/firebase.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    const db = getDatabase(app);
+
     let query = $(frm.query).val();
     let page=1;
     let size=5;
 
     getLocals();
+
+    // 즐겨찾기 버튼을 눌렀을 때
+    // async, await 기말고사 언급 ★ [ get,set은 비동기 함수이기때문에 작업이 완료될때까지 기다릴 필요가 있음 ]
+    $("#div_locals").on("click", ".favorite", async function(){
+        if(!sessionStorage.getItem("uid")){
+            // 로그인 후 다시 지역검색 페이지로 돌아오기 위해 지역검색 페이지 저장
+            sessionStorage.setItem("target","/locals");
+            location.href = "/users/login";
+        }else{
+            const local = JSON.parse($(this).attr("local"));
+            console.log(local);
+            const ref_favorite = ref(db, `favorite/${sessionStorage.getItem("uid")}/${local.id}`);
+            const snapshot = await get(ref_favorite);
+            if(snapshot.val()){
+                alert("즐겨찾기에 이미 등록되었습니다.")
+            }else{
+                await set(ref_favorite, local);
+                alert("즐겨찾기에 등록되었습니다.")
+            }
+            console.log(snapshot.val());
+        }
+    });
 
     // 위치보기 버튼을 눌렀을 때
     $("#div_locals").on("click", "button", function(){

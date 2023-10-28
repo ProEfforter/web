@@ -59,8 +59,15 @@
                 // 개발자도구(F12) - Application - session storage 저장
                 sessionStorage.setItem("email",email);
                 sessionStorage.setItem("uid",success.user.uid);
-                // 홈화면으로 이동
-                location.href="/";
+                // 지역검색을 통해 로그인 페이지 이동 시, 로그인 후 다시 지역검색 페이지로 돌아옴
+                if(sessionStorage.getItem("target")){
+                    location.href = sessionStorage.getItem("target");
+                }
+                else{
+                    // 홈화면으로 이동
+                    location.href="/";
+                }
+
             }).catch(error=>{
                 // 로그인 실패 시
                 console.log(error);
