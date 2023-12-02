@@ -12,3 +12,12 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
+
+.ellipsis2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  /* 몇줄까지 표현 허용할기 결정하는 변수 값 */
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

@@ -32,6 +32,7 @@
     import { getFirestore,collection } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
     import { query,orderBy,getDocs,where,doc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
     const db = getFirestore(app);
+
     let page = 1;
     const size = 3;
     let total = 0;
@@ -48,6 +49,8 @@
             const totalPages=Math.ceil(total/size);
             $("#pagination").twbsPagination("changeTotalPages", totalPages, 1);
         }
+        
+        // 현재 데이터 목록 출력
         const rows=[];
         snapshot.docs.forEach((doc, index)=>{
             const start = (page-1) * size;
